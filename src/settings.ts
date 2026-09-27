@@ -38,17 +38,37 @@ const templateLine = {
 } as const satisfies SettingsSchema;
 
 export const DEFAULT_BIO_LINES = [
+  {
+    content: '{{ favorites.group_0.name }}: {{ favorites.group_0.names | join: ", " }} <3',
+    compact: '{{ favorites.group_0.name }}: {{ favorites.group_0.count }} <3',
+    priority: 10,
+  },
+  {
+    content: '{{ favorites.group_1.name }}: {{ favorites.group_1.names | join: ", " }}',
+    compact: '{{ favorites.group_1.name }}: {{ favorites.group_1.count }}',
+    priority: 10,
+  },
   { content: 'Rank: {rank}', compact: '', priority: 5 },
   { content: 'Friends: {friends} | Blocked: {blocked} | Muted: {muted}', compact: 'F: {friends} | B: {blocked} | M: {muted}', priority: 0 },
-  { content: 'Tagged: {tagged} / {totalTags}', compact: '', priority: 0 },
   { content: 'Time played: {playtime}', compact: '{playtime}', priority: 0 },
   { content: 'Date joined: {dateJoined}', compact: 'Joined: {dateJoinedShort}', priority: 0 },
   { content: 'Last updated: {now} (every {interval})', compact: 'Updated: {nowTime}', priority: 0 },
+  { content: 'Tagged: {tagged} / {totalTags}', compact: '', priority: 0 },
+  { content: 'User ID: {userId}', compact: '', priority: 0 },
+  { content: 'Steam ID: {steamId}', compact: '', priority: 0 },
 ] as const;
 
 export const DEFAULT_STATUS_LINES = [
-  { content: '{{ "in " + world if world else "" }}', compact: '', priority: 20 },
+  { content: 'tg:@blubotanica|dc:@bluscream', compact: 'dc:@bluscream', priority: 20 },
 ] as const;
+
+export const DEFAULT_LINKS = [
+  { url: 'https://steamcommunity.com/profiles/{steamId}' },
+  { url: 'https://vrchat.com/home/user/{userId}' },
+] as const;
+
+/** The list the original shipped with: FewTags' public user tags. */
+export const DEFAULT_TAG_SOURCE = 'https://github.com/Bluscream/FewTags/raw/refs/heads/main/usertags.json';
 
 export const settings = {
   enabled: {
@@ -69,16 +89,18 @@ export const settings = {
     description: 'How often the profile is rewritten. VRChat rate-limits its API; hours, not minutes.',
     default: 120,
     markers: [15, 30, 60, 120, 240, 480],
+    integer: true,
     unit: ' min',
   },
   initialDelaySecs: {
     kind: 'number',
     label: 'Wait before the first run',
     description: 'Gives VRCNext time to load your friends and favourites after a start.',
-    default: 30,
+    default: 5,
     min: 5,
     max: 600,
     step: 5,
+    integer: true,
     unit: 's',
     slider: true,
   },
@@ -129,7 +151,7 @@ export const settings = {
     titleKey: 'url',
     addLabel: 'Add link',
     max: 3,
-    default: [],
+    default: [...DEFAULT_LINKS],
     item: {
       url: { kind: 'string', label: 'URL', default: '', placeholder: 'https://vrchat.com/home/user/{userId}', format: 'url' },
     },
@@ -158,13 +180,13 @@ export const settings = {
     description: 'JSON files mapping user ids to tags; fills {tagged} and {totalTags}.',
     titleKey: 'url',
     addLabel: 'Add source',
-    default: [],
+    default: [{ url: DEFAULT_TAG_SOURCE }],
     item: {
       url: {
         kind: 'string',
         label: 'URL',
         default: '',
-        placeholder: 'https://raw.githubusercontent.com/…/usertags.json',
+        placeholder: DEFAULT_TAG_SOURCE,
         format: 'url',
       },
     },

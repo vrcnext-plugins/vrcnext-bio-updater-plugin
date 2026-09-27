@@ -32,11 +32,14 @@ generated part is fitted into what is left. The default separator is a line cont
 
 | Group | Names |
 | :--- | :--- |
-| You | `name` `userId` `rank` `status` `statusDescription` `platform` `avatarId` `dateJoined` `dateJoinedShort` `vrcRunning` |
+| You | `name` `userId` `rank` `rankText` `steamId` `status` `statusDescription` `platform` `avatarId` `dateJoined` `dateJoinedShort` `vrcRunning` |
 | Counts | `friends` `blocked` `muted` `hiddenAvatars` `tagged` `totalTags` |
 | Time | `playtime` `playtimeHours` `now` `nowTime` `date` `interval` |
 | Where you are | `world` `worldId` `instanceType` `region` |
 | Favourites | `favorites.<group>` → `.name` `.tag` `.names` `.count` |
+
+Ranks are VRCNext's own: the tags are offset by one, so `system_trust_trusted` reads as
+**Known**, exactly as the profile badge in VRCNext shows it.
 
 `favorites` is keyed by both VRChat's tag (`group_0`) and the name you gave the group, so both of
 these work:

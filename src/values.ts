@@ -7,37 +7,24 @@
  * rather than failing the run: a line whose placeholders all came out empty is simply dropped.
  */
 
-import { parseLocation, timeAgo, type TemplateValues, type VrcSelf, type VrchatApi } from '@vrcnext/plugin-api';
+import {
+  formatDuration,
+  parseLocation,
+  timeAgo,
+  trustRank,
+  type TemplateValues,
+  type VrcSelf,
+  type VrchatApi,
+} from '@vrcnext/plugin-api';
 
 import type { Values } from './settings.js';
 
-/** VRChat's trust ranks, best first, as they appear in a user's tags. */
-const RANKS: readonly (readonly [string, string])[] = [
-  ['system_trust_legend', 'Legend'],
-  ['system_trust_veteran', 'Veteran'],
-  ['system_trust_trusted', 'Trusted'],
-  ['system_trust_known', 'Known'],
-  ['system_trust_basic', 'User'],
-  ['system_trust_visitor', 'Visitor'],
-];
-
-export function trustRank(tags: readonly string[]): string {
-  return RANKS.find(([tag]) => tags.includes(tag))?.[1] ?? 'Visitor';
-}
-
-/** `3 days (72h)` — the shape the original used, which reads well in a bio. */
+/** `4 months (3120h)` — a length of time plus the raw hours, which is what a bio line wants. */
 export function formatPlaytime(minutes: number): string {
   if (minutes <= 0) return '';
   const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-  const months = Math.floor(days / 30);
-  const years = Math.floor(days / 365);
-  const unit =
-    years >= 1 ? `${String(years)} ${years === 1 ? 'year' : 'years'}`
-    : months >= 1 ? `${String(months)} ${months === 1 ? 'month' : 'months'}`
-    : days >= 1 ? `${String(days)} ${days === 1 ? 'day' : 'days'}`
-    : '';
-  return unit === '' ? `${String(hours)}h` : `${unit} (${String(hours)}h)`;
+  const unit = formatDuration(minutes * 60_000);
+  return unit === '' || unit.endsWith('minutes') || unit.endsWith('minute') ? `${String(hours)}h` : `${unit} (${String(hours)}h)`;
 }
 
 export interface Extras {
@@ -92,7 +79,9 @@ export async function buildValues(
     name: self.displayName,
     displayName: self.displayName,
     userId: self.id,
-    rank: trustRank(self.tags),
+    steamId: values.steam.steamId,
+    rank: trustRank(self.tags).short,
+    rankText: trustRank(self.tags).label,
     status: self.status,
     statusDescription: self.statusDescription,
     platform: self.platform,
