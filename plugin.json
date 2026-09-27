@@ -1,0 +1,15 @@
+{
+  "id": "bio-updater",
+  "name": "Bio Updater",
+  "version": "1.0.0",
+  "apiVersion": "^0.3.1",
+  "description": "Writes your VRChat bio, status, pronouns and links from templates: friends, rank, favourite groups, Steam hours, tags and where you are. Lines shorten by priority instead of being cut.",
+  "author": "vrcnext-plugins",
+  "homepage": "https://github.com/vrcnext-plugins/vrcnext-bio-updater-plugin",
+  "tags": ["utility", "customisation", "activity"],
+  "permissions": ["vrchat", "host:actions", "notifications", "network"],
+  "optionalPermissions": [],
+  "actions": ["vrcUpdateProfile", "vrcUpdateStatus"],
+  "events": [],
+  "hosts": ["api.steampowered.com", "raw.githubusercontent.com"]
+}

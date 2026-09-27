@@ -1,0 +1,22 @@
+{
+  "name": "vrcnext-bio-updater-plugin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "VRCNext plugin: keeps your VRChat bio, status, pronouns and links written from templates.",
+  "license": "Unlicense",
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit && eslint . && vitest run"
+  },
+  "dependencies": {
+    "@vrcnext/plugin-api": "file:../vrcnext-plugin-system/packages/api"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2",
+    "vitest": "^5.0.1"
+  }
+}
