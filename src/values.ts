@@ -23,11 +23,14 @@ import type { Values } from './settings.js';
 export function formatPlaytime(minutes: number): string {
   if (minutes <= 0) return '';
   const hours = Math.floor(minutes / 60);
-  const unit = formatDuration(minutes * 60_000);
-  return unit === '' || unit.endsWith('minutes') || unit.endsWith('minute') ? `${String(hours)}h` : `${unit} (${String(hours)}h)`;
+  // Under an hour there is no coarser unit to add, and "45 minutes (0h)" says less than "0h".
+  if (hours < 1) return `${String(hours)}h`;
+  return `${formatDuration(minutes * 60_000)} (${String(hours)}h)`;
 }
 
 export interface Extras {
+  /** Your friends, as the caller already read them for the tag count. */
+  readonly friends: readonly { readonly id: string }[];
   /** Minutes from Steam, or 0 when it was not asked or did not answer. */
   readonly steamMinutes: number;
   /** How many of your friends appear in the tag sources. */
@@ -50,8 +53,7 @@ export async function buildValues(
   values: Values,
   extras: Extras,
 ): Promise<TemplateValues> {
-  const [friends, groups, moderation, instance] = await Promise.all([
-    vrchat.friends(),
+  const [groups, moderation, instance] = await Promise.all([
     vrchat.favoriteFriendGroups(),
     vrchat.moderationCounts(),
     vrchat.currentInstance(),
@@ -71,6 +73,7 @@ export async function buildValues(
     if (group.displayName !== '') favorites[group.displayName] = entry;
   }
 
+  const rank = trustRank(self.tags);
   const now = new Date();
   const joined = self.dateJoined === '' ? undefined : new Date(self.dateJoined);
   const at = instance === undefined ? undefined : parseLocation(instance.location);
@@ -80,14 +83,14 @@ export async function buildValues(
     displayName: self.displayName,
     userId: self.id,
     steamId: values.steam.steamId,
-    rank: trustRank(self.tags).short,
-    rankText: trustRank(self.tags).label,
+    rank: rank.short,
+    rankText: rank.label,
     status: self.status,
     statusDescription: self.statusDescription,
     platform: self.platform,
     avatarId: self.currentAvatarId,
 
-    friends: friends.length,
+    friends: extras.friends.length,
     blocked: moderation.blocked,
     muted: moderation.muted,
     hiddenAvatars: moderation.hiddenAvatar,

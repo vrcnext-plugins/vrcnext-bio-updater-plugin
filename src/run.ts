@@ -68,6 +68,7 @@ export async function runOnce(ctx: Ctx, write: boolean): Promise<RunResult> {
     }),
   ]);
   const templateValues = await buildValues(ctx.vrchat, self, values, {
+    friends,
     steamMinutes: steam,
     tagged: tags.tagged,
     totalTags: tags.totalTags,
