@@ -60,11 +60,18 @@ test('tag sources count matching friends and distinct tags, ignoring rich text',
     'https://tags.test/b': { usr_9: { tags: ['Other'] } },
   });
   const result = await loadTags(http, { urls: ['https://tags.test/a', 'https://tags.test/b'], userIds: ['usr_1', 'usr_2', 'usr_4'], logger: silent, signal: never });
-  assert.deepEqual(result, { tagged: 2, totalTags: 3 });
+  assert.deepEqual(result, { tagged: 2, totalTags: 3, problems: [] });
 });
 
-test('an unreachable or empty source is skipped', async () => {
+test('an unreachable source counts nothing and says so, and a blank url is skipped silently', async () => {
   const http = fakeHttp({ 'https://tags.test/a': 'error' });
-  assert.deepEqual(await loadTags(http, { urls: ['https://tags.test/a', '  '], userIds: ['usr_1'], logger: silent, signal: never }), { tagged: 0, totalTags: 0 });
-  assert.deepEqual(await loadTags(fakeHttp({}), { urls: ['https://nope.test'], userIds: ['usr_1'], logger: silent, signal: never }), { tagged: 0, totalTags: 0 });
+  const failed = await loadTags(http, { urls: ['https://tags.test/a', '  '], userIds: ['usr_1'], logger: silent, signal: never });
+  assert.equal(failed.tagged, 0);
+  assert.equal(failed.totalTags, 0);
+  assert.equal(failed.problems.length, 1, 'the blank url is not a problem, the broken one is');
+  assert.match(failed.problems[0] ?? '', /https:\/\/tags\.test\/a/);
+
+  const missing = await loadTags(fakeHttp({}), { urls: ['https://nope.test'], userIds: ['usr_1'], logger: silent, signal: never });
+  assert.equal(missing.totalTags, 0);
+  assert.equal(missing.problems.length, 1);
 });

@@ -62,6 +62,8 @@ export interface TagResult {
   readonly tagged: number;
   /** How many distinct tag strings the sources define. */
   readonly totalTags: number;
+  /** One sentence per source that could not be read; empty when every source loaded. */
+  readonly problems: readonly string[];
 }
 
 export interface TagRequest {
@@ -101,18 +103,26 @@ export async function loadTags(http: HttpApi, request: TagRequest): Promise<TagR
   const { logger, signal } = request;
   const known = new Set<string>();
   const tags = new Set<string>();
+  // Reported as well as logged: a source that silently fails reads as "Tagged: 0 / 0", which
+  // looks like an empty file rather than a broken URL.
+  const problems: string[] = [];
   for (const url of request.urls) {
     if (url.trim() === '') continue;
     try {
       const response = await http.fetch(url.trim(), { signal, credentials: 'omit', referrerPolicy: 'no-referrer' });
       if (!response.ok) {
-        logger.warn(`Tag source ${url} answered ${String(response.status)}.`);
+        const problem = `Tag source ${url} answered ${String(response.status)}.`;
+        logger.warn(problem);
+        problems.push(problem);
         continue;
       }
       collect(await response.json(), known, tags);
     } catch (error) {
-      logger.warn(`Tag source ${url} failed: ${String(error)}`);
+      // A cross-origin URL that sends no CORS headers lands here, as an opaque "Load failed".
+      const problem = `Tag source ${url} could not be read: ${error instanceof Error ? error.message : String(error)}`;
+      logger.warn(problem);
+      problems.push(problem);
     }
   }
-  return { tagged: request.userIds.filter((id) => known.has(id)).length, totalTags: tags.size };
+  return { tagged: request.userIds.filter((id) => known.has(id)).length, totalTags: tags.size, problems };
 }

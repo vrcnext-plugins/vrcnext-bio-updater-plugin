@@ -68,7 +68,9 @@ export const DEFAULT_LINKS = [
 ] as const;
 
 /** The list the original shipped with: FewTags' public user tags. */
-export const DEFAULT_TAG_SOURCE = 'https://github.com/Bluscream/FewTags/raw/refs/heads/main/usertags.json';
+// raw.githubusercontent.com, not github.com/.../raw/...: the redirecting github.com endpoint
+// sends no CORS headers, so a fetch from this page fails outright rather than following it.
+export const DEFAULT_TAG_SOURCE = 'https://raw.githubusercontent.com/Bluscream/FewTags/refs/heads/main/usertags.json';
 
 export const settings = {
   enabled: {
