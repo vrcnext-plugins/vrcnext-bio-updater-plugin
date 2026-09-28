@@ -53,8 +53,8 @@ function renderLinks(values: Values, templateValues: TemplateValues, problems: s
  */
 export async function runOnce(ctx: Ctx, write: boolean): Promise<RunResult> {
   const values = ctx.settings.values;
-  const self = ctx.vrchat.self();
-  if (self === undefined) throw new Error('Not signed in to VRChat yet.');
+  const me = ctx.vrchat.self();
+  if (me === undefined) throw new Error('Not signed in to VRChat yet.');
   const problems: string[] = [];
 
   const friends = await ctx.vrchat.friends();
@@ -68,7 +68,7 @@ export async function runOnce(ctx: Ctx, write: boolean): Promise<RunResult> {
     }),
   ]);
   problems.push(...tags.problems);
-  const templateValues = await buildValues(ctx.vrchat, self, values, {
+  const templateValues = await buildValues(ctx.vrchat, me, values, {
     friends,
     steamMinutes: steam,
     tagged: tags.tagged,
@@ -83,7 +83,7 @@ export async function runOnce(ctx: Ctx, write: boolean): Promise<RunResult> {
     values: templateValues,
     limit: LIMITS.bio,
     separator: '\n',
-    current: self.bio,
+    current: me.bio,
     prefixSeparator: values.bioSeparator,
     onError,
   });
@@ -92,7 +92,7 @@ export async function runOnce(ctx: Ctx, write: boolean): Promise<RunResult> {
     values: templateValues,
     limit: LIMITS.status,
     separator: values.statusSeparator,
-    current: self.statusDescription,
+    current: me.statusDescription,
     prefixSeparator: values.statusSeparator,
     onError,
   });
@@ -121,26 +121,26 @@ interface Rendered {
  * field alone", which is how you keep a status you set by hand.
  */
 function writeProfile(ctx: Ctx, rendered: Rendered): readonly string[] {
-  const self = ctx.vrchat.self();
+  const me = ctx.vrchat.self();
   const wrote: string[] = [];
   const profile: Record<string, unknown> = {};
 
-  if (rendered.bio.body !== '' && rendered.bio.text !== self?.bio) {
+  if (rendered.bio.body !== '' && rendered.bio.text !== me?.bio) {
     profile['bio'] = rendered.bio.text;
     wrote.push('bio');
   }
-  if (rendered.pronouns.body !== '' && rendered.pronouns.text !== self?.pronouns) {
+  if (rendered.pronouns.body !== '' && rendered.pronouns.text !== me?.pronouns) {
     profile['pronouns'] = rendered.pronouns.text;
     wrote.push('pronouns');
   }
-  if (rendered.links.length > 0 && rendered.links.join('\n') !== (self?.bioLinks ?? []).join('\n')) {
+  if (rendered.links.length > 0 && rendered.links.join('\n') !== (me?.bioLinks ?? []).join('\n')) {
     profile['bioLinks'] = rendered.links;
     wrote.push('links');
   }
   if (Object.keys(profile).length > 0) ctx.bridge.send('vrcUpdateProfile', profile);
 
-  if (rendered.status.body !== '' && rendered.status.text !== self?.statusDescription) {
-    ctx.bridge.send('vrcUpdateStatus', { status: self?.status ?? 'active', statusDescription: rendered.status.text });
+  if (rendered.status.body !== '' && rendered.status.text !== me?.statusDescription) {
+    ctx.bridge.send('vrcUpdateStatus', { status: me?.status ?? 'active', statusDescription: rendered.status.text });
     wrote.push('status');
   }
   return wrote;

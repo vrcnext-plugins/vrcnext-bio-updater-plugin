@@ -49,7 +49,7 @@ function two(n: number): string {
  */
 export async function buildValues(
   vrchat: VrchatApi,
-  self: VrcSelf,
+  me: VrcSelf,
   values: Values,
   extras: Extras,
 ): Promise<TemplateValues> {
@@ -73,22 +73,22 @@ export async function buildValues(
     if (group.displayName !== '') favorites[group.displayName] = entry;
   }
 
-  const rank = trustRank(self.tags);
+  const rank = trustRank(me.tags);
   const now = new Date();
-  const joined = self.dateJoined === '' ? undefined : new Date(self.dateJoined);
+  const joined = me.dateJoined === '' ? undefined : new Date(me.dateJoined);
   const at = instance === undefined ? undefined : parseLocation(instance.location);
 
   return {
-    name: self.displayName,
-    displayName: self.displayName,
-    userId: self.id,
+    name: me.displayName,
+    displayName: me.displayName,
+    userId: me.id,
     steamId: values.steam.steamId,
     rank: rank.short,
     rankText: rank.label,
-    status: self.status,
-    statusDescription: self.statusDescription,
-    platform: self.platform,
-    avatarId: self.currentAvatarId,
+    status: me.status,
+    statusDescription: me.statusDescription,
+    platform: me.platform,
+    avatarId: me.currentAvatarId,
 
     friends: extras.friends.length,
     blocked: moderation.blocked,
@@ -100,9 +100,9 @@ export async function buildValues(
     playtime: formatPlaytime(extras.steamMinutes),
     playtimeHours: extras.steamMinutes === 0 ? '' : String(Math.floor(extras.steamMinutes / 60)),
 
-    dateJoined: joined === undefined ? '' : `${self.dateJoined.slice(0, 10)} (${timeAgo(joined)})`,
-    dateJoinedShort: self.dateJoined.slice(0, 10),
-    vrcRunning: self.vrcRunning,
+    dateJoined: joined === undefined ? '' : `${me.dateJoined.slice(0, 10)} (${timeAgo(joined)})`,
+    dateJoinedShort: me.dateJoined.slice(0, 10),
+    vrcRunning: me.vrcRunning,
 
     world: instance?.worldName ?? '',
     worldId: instance?.worldId ?? '',

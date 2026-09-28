@@ -89,7 +89,7 @@ export class BioPanel {
     const k = this.#ctx.ui.kit;
     const values = this.#ctx.settings.values;
     const state = this.#deps.state();
-    const self = this.#ctx.vrchat.self();
+    const me = this.#ctx.vrchat.self();
     const rows = [
       k.row({
         label: 'Updating',
@@ -99,7 +99,7 @@ export class BioPanel {
             ? k.badge('warn', 'Preview only')
             : k.badge('ok', `Every ${String(values.intervalMinutes)} min`),
       }),
-      k.row({ label: 'Account', detail: self === undefined ? 'Waiting for VRChat login' : self.displayName }),
+      k.row({ label: 'Account', detail: me === undefined ? 'Waiting for VRChat login' : me.displayName }),
       k.row({
         label: 'Last run',
         detail: state.last === undefined
