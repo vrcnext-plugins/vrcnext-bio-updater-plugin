@@ -99,3 +99,15 @@ one.
 ```bash
 npm install && npm run check
 ```
+
+## Signature
+
+Every release of this plugin is signed; the bridge refuses to install or update it otherwise,
+and it stays pinned to this key. Check the fingerprint against the one VRCNext shows you when it
+asks whether to trust a new signing key:
+
+```
+1bc6-e13e-c44c-3bd0-f5a8-5618-8b9b-919c
+```
+
+If an update ever says the key changed, stop and ask before confirming.
