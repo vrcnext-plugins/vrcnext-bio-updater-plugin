@@ -17,7 +17,7 @@ const templateLine = {
   content: {
     kind: 'string',
     label: 'Line',
-    description: 'A template. {name} is short for {{ name }}; see the plugin’s README for every variable.',
+    description: 'A template. {name} is short for {{ name }}; every variable is listed on the plugin’s documentation page.',
     default: '',
     placeholder: 'Friends: {friends}',
   },
