@@ -1,6 +1,6 @@
 {
   "name": "vrcnext-bio-updater-plugin",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "private": true,
   "description": "VRCNext plugin: keeps your VRChat bio, status, pronouns and links written from templates.",
   "license": "Unlicense",
