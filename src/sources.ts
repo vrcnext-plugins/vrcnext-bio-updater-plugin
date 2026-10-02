@@ -23,6 +23,8 @@ export async function steamMinutes(http: HttpApi, options: SteamOptions, logger:
   url.searchParams.set('include_played_free_games', '1');
   url.searchParams.set('format', 'json');
   try {
+    // reuse: Steam hours are Steam's. VRCNext tracks VRChat time, which is a different
+    // number, and has no Steam integration to read.
     const response = await http.fetch(url, { signal, credentials: 'omit', referrerPolicy: 'no-referrer' });
     if (!response.ok) {
       logger.warn(`Steam answered ${String(response.status)}; playtime left empty.`);
@@ -109,6 +111,7 @@ export async function loadTags(http: HttpApi, request: TagRequest): Promise<TagR
   for (const url of request.urls) {
     if (url.trim() === '') continue;
     try {
+      // reuse: a tag list the user points at themselves, at a URL only they know.
       const response = await http.fetch(url.trim(), { signal, credentials: 'omit', referrerPolicy: 'no-referrer' });
       if (!response.ok) {
         const problem = `Tag source ${url} answered ${String(response.status)}.`;
