@@ -53,9 +53,11 @@ export async function buildValues(
   values: Values,
   extras: Extras,
 ): Promise<TemplateValues> {
-  const [groups, moderation, instance] = await Promise.all([
+  // `moderationCounts` is a read of what VRCNext already holds, not a lookup, so it is not in
+  // the parallel batch — there is nothing for it to wait alongside.
+  const moderation = vrchat.moderationCounts();
+  const [groups, instance] = await Promise.all([
     vrchat.favoriteFriendGroups(),
-    vrchat.moderationCounts(),
     vrchat.currentInstance(),
   ]);
 
